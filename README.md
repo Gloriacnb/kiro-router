@@ -80,8 +80,8 @@ Made with ❤️ by [@Jwadow](https://github.com/jwadow)
 
 ```bash
 # Clone the repository (requires Git)
-git clone https://github.com/Jwadow/kiro-gateway.git
-cd kiro-gateway
+git clone https://github.com/Jwadow/kirogw.git
+cd kirogw
 
 # Or download ZIP: Code → Download ZIP → extract → open kiro-gateway folder
 
