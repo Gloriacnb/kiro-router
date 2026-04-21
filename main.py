@@ -62,6 +62,7 @@ from kiro.config import (
     KIRO_CREDS_FILE,
     KIRO_CLI_DB_FILE,
     PROXY_API_KEY,
+    DEFAULT_PROXY_API_KEY,
     LOG_LEVEL,
     SERVER_HOST,
     SERVER_PORT,
@@ -212,6 +213,14 @@ def validate_configuration() -> None:
         SystemExit: If critical configuration is missing
     """
     errors = []
+    
+    # Warn about default PROXY_API_KEY
+    if PROXY_API_KEY == DEFAULT_PROXY_API_KEY:
+        logger.warning("")
+        logger.warning("⚠️  PROXY_API_KEY is using the default value!")
+        logger.warning("   Anyone who knows this default can access your gateway.")
+        logger.warning("   Set a unique PROXY_API_KEY in your .env file.")
+        logger.warning("")
     
     # Check if .env file exists (optional - can use environment variables)
     env_file = Path(".env")

@@ -58,6 +58,24 @@ def get_machine_fingerprint() -> str:
         return hashlib.sha256(b"default-kiro-gateway").hexdigest()
 
 
+import platform as _platform
+
+def _get_os_tag() -> str:
+    """Returns OS tag for User-Agent (e.g., 'os/macos#14.0', 'os/linux#6.5', 'os/win32#10.0')."""
+    system = _platform.system().lower()
+    version = _platform.release()
+    if system == "darwin":
+        # Use macOS marketing version instead of kernel version
+        mac_ver = _platform.mac_ver()[0] or version
+        return f"os/macos#{mac_ver}"
+    elif system == "windows":
+        return f"os/win32#{version}"
+    else:
+        return f"os/{system}#{version}"
+
+_OS_TAG: str = _get_os_tag()
+
+
 def get_kiro_headers(auth_manager: "KiroAuthManager", token: str) -> dict:
     """
     Builds headers for Kiro API requests.
@@ -79,7 +97,7 @@ def get_kiro_headers(auth_manager: "KiroAuthManager", token: str) -> dict:
     return {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
-        "User-Agent": f"aws-sdk-js/1.0.27 ua/2.1 os/win32#10.0.19044 lang/js md/nodejs#22.21.1 api/codewhispererstreaming#1.0.27 m/E KiroIDE-0.7.45-{fingerprint}",
+        "User-Agent": f"aws-sdk-js/1.0.27 ua/2.1 {_OS_TAG} lang/js md/nodejs#22.21.1 api/codewhispererstreaming#1.0.27 m/E KiroIDE-0.7.45-{fingerprint}",
         "x-amz-user-agent": f"aws-sdk-js/1.0.27 KiroIDE-0.7.45-{fingerprint}",
         "x-amzn-codewhisperer-optout": "true",
         "x-amzn-kiro-agent-mode": "vibe",
