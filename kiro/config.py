@@ -31,7 +31,7 @@ from typing import Dict, List, Optional
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv(os.getenv("KIRO_ENV_FILE", ".env"))
 
 
 def _get_raw_env_value(var_name: str, env_file: str = ".env") -> Optional[str]:

@@ -47,6 +47,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import httpx
+import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -631,30 +632,20 @@ def print_startup_banner(host: str, port: int) -> None:
 
 
 # --- Entry Point ---
-if __name__ == "__main__":
-    import uvicorn
-    
-    # Run configuration validation before starting server
+def main() -> None:
     validate_configuration()
-    
-    # Warn about suboptimal timeout configuration
     _warn_timeout_configuration()
-    
-    # Parse CLI arguments
     args = parse_cli_args()
-    
-    # Resolve final configuration with priority hierarchy
     final_host, final_port = resolve_server_config(args)
-    
-    # Print startup banner
     print_startup_banner(final_host, final_port)
-    
     logger.info(f"Starting Uvicorn server on {final_host}:{final_port}...")
-    
-    # Use string reference to avoid double module import
     uvicorn.run(
         "main:app",
         host=final_host,
         port=final_port,
         log_config=UVICORN_LOG_CONFIG,
     )
+
+
+if __name__ == "__main__":
+    main()
