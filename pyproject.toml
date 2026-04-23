@@ -22,4 +22,4 @@ dev = [
 ]
 
 [project.scripts]
-kiro-gateway = "main:main"
+kiro-gateway = "kiro.__main__:main"
