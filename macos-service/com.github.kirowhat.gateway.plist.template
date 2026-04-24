@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- 服务标识符 -->
+    <key>Label</key>
+    <string>com.github.kirowhat.gateway</string>
+
+    <!-- 要执行的程序和参数 -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{KIRO_GATEWAY_PATH}}</string>
+    </array>
+
+    <!-- 在加载时立即启动（开机自启） -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- 进程崩溃时自动重启 -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+
+    <!-- 环境变量 -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- Kiro 配置文件路径 -->
+        <key>KIRO_ENV_FILE</key>
+        <string>{{ENV_FILE_PATH}}</string>
+
+        <!-- 确保 PATH 包含 uv 安装的路径 -->
+        <key>PATH</key>
+        <string>{{PATH}}</string>
+
+        <!-- 用户主目录 -->
+        <key>HOME</key>
+        <string>{{HOME}}</string>
+    </dict>
+
+    <!-- 工作目录 -->
+    <key>WorkingDirectory</key>
+    <string>{{HOME}}</string>
+
+    <!-- 标准输出日志 -->
+    <key>StandardOutPath</key>
+    <string>{{HOME}}/Library/Logs/com.github.kirowhat.gateway/stdout.log</string>
+
+    <!-- 错误输出日志 -->
+    <key>StandardErrorPath</key>
+    <string>{{HOME}}/Library/Logs/com.github.kirowhat.gateway/stderr.log</string>
+
+    <!-- 进程退出时重启（非正常退出） -->
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+
+    <!-- 运行级别：后台运行 -->
+    <key>LimitLoadToSessionType</key>
+    <array>
+        <string>Aqua</string>
+        <string>Background</string>
+    </array>
+</dict>
+</plist>

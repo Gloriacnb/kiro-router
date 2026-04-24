@@ -408,6 +408,7 @@ Examples:
   kiro-gateway --port 9000               # Override port only
   kiro-gateway --host 127.0.0.1          # Local connections only
   kiro-gateway -H 0.0.0.0 -p 8080        # Short form
+  kiro-gateway --configure-claude         # Configure Claude Code to use this gateway
         """
     )
 
@@ -425,6 +426,12 @@ Examples:
         default=None,
         metavar="PORT",
         help=f"Server port (default: {DEFAULT_SERVER_PORT}, env: SERVER_PORT)"
+    )
+
+    parser.add_argument(
+        "--configure-claude",
+        action="store_true",
+        help="Configure Claude Code to use this gateway"
     )
 
     parser.add_argument(
@@ -491,10 +498,83 @@ def print_startup_banner(host: str, port: int) -> None:
     print()
 
 
+def configure_claude_code(args) -> None:
+    """Configure Claude Code to use Kiro Gateway."""
+    import json
+    import subprocess
+    from pathlib import Path
+
+    print()
+    print("=" * 60)
+    print("  Claude Code Configuration for Kiro Gateway")
+    print("=" * 60)
+    print()
+
+    try:
+        subprocess.run(["claude", "--version"], capture_output=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        logger.error("Claude Code CLI not found!")
+        logger.error("Please install Claude Code first: https://claude.ai/code")
+        sys.exit(1)
+
+    final_host, final_port = resolve_server_config(args)
+    client_host = "localhost" if final_host == "0.0.0.0" else final_host
+    gateway_url = f"http://{client_host}:{final_port}/v1"
+
+    print(f"Gateway URL: {gateway_url}")
+    print(f"API Key: {PROXY_API_KEY[:10]}...")
+    print()
+
+    settings_path = Path.home() / ".claude" / "settings.json"
+
+    try:
+        with open(settings_path, 'r') as f:
+            settings = json.load(f)
+    except FileNotFoundError:
+        logger.error(f"Settings file not found: {settings_path}")
+        logger.error("Please make sure Claude Code is installed and has been run at least once.")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Failed to read Claude Code settings: {e}")
+        sys.exit(1)
+
+    settings.setdefault("env", {})
+    settings["env"]["ANTHROPIC_BASE_URL"] = gateway_url
+    settings["env"]["ANTHROPIC_API_KEY"] = PROXY_API_KEY
+
+    try:
+        with open(settings_path, 'w') as f:
+            json.dump(settings, f, indent=2)
+    except Exception as e:
+        logger.error(f"Failed to write Claude Code settings: {e}")
+        sys.exit(1)
+
+    print("✓ API URL configured")
+    print("✓ API Key configured")
+    print()
+    print("=" * 60)
+    print("  Configuration Complete!")
+    print("=" * 60)
+    print()
+    print(f"  API URL:  {gateway_url}")
+    print(f"  API Key:  {PROXY_API_KEY[:10]}...")
+    print(f"  Settings: {settings_path}")
+    print()
+    print("Start a new Claude Code session to use Kiro Gateway:")
+    print("  claude")
+    print()
+
+
 def main() -> None:
     validate_configuration()
     _warn_timeout_configuration()
     args = parse_cli_args()
+
+    # Handle --configure-claude flag
+    if args.configure_claude:
+        configure_claude_code(args)
+        sys.exit(0)
+
     final_host, final_port = resolve_server_config(args)
     print_startup_banner(final_host, final_port)
     logger.info(f"Starting Uvicorn server on {final_host}:{final_port}...")

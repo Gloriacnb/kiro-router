@@ -63,6 +63,45 @@ uv run python main.py --host 127.0.0.1
 uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
+## 后台运行和开机自启
+
+### macOS
+
+使用 LaunchAgent 实现后台运行和开机自启：
+
+```bash
+# 1. 全局安装
+uv tool install . --global
+
+# 2. 安装服务
+cd macos-service
+./install-macos-service.sh
+
+# 3. 管理服务
+./kiro-gateway-service.sh start    # 启动
+./kiro-gateway-service.sh stop     # 停止
+./kiro-gateway-service.sh restart  # 重启
+./kiro-gateway-service.sh status   # 状态
+./kiro-gateway-service.sh logs     # 日志
+```
+
+详细说明：[macos-service/README.md](macos-service/README.md)
+
+### Windows
+
+使用 VBScript 实现后台运行：
+
+```bash
+# 1. 全局安装
+uv tool install . --global
+
+# 2. 编辑启动脚本
+# 修改 start-kiro-gateway.vbs 中的 KIRO_ENV_FILE 路径
+
+# 3. 配置任务计划程序实现开机自启
+# 将 start-kiro-gateway.vbs 添加到 Windows 任务计划程序
+```
+
 ## 可用模型
 
 > 模型可用性取决于你的 Kiro 订阅等级（免费/付费）。
